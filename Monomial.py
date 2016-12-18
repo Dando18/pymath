@@ -18,6 +18,9 @@ class Monomial(object):
         s += ' == ' + str(self.eval(value))
         return s
 
+    def add(self, other):
+        self += other
+
     def __add__(self, other):
         if type(other) is Monomial:
             if self.power == other.power:
@@ -26,6 +29,9 @@ class Monomial(object):
                 return Polynomial([self, other])
         elif type(other) is float or type(other) is int:
             return Polynomial([self, Monomial(other, 0)])
+
+    def sub(self, other):
+        self -= other
 
     def __sub__(self, other):
         if type(other) is Monomial:
@@ -36,11 +42,17 @@ class Monomial(object):
         elif type(other) is float or type(other) is int:
             return Polynomial([self, Monomial(-other, 0)])
 
+    def mul(self, other):
+        self *= other
+
     def __mul__(self, other):
         if type(other) is Monomial:
             return Monomial(self.coeff * other.coeff, self.power + other.power)
         elif type(other) is float or type(other) is int:
             return Monomial(self.coeff * other, self.power)
+
+    def div(self, other):
+        self /= other
 
     def __truediv__(self, other):
         if type(other) is Monomial:
@@ -48,9 +60,15 @@ class Monomial(object):
         elif type(other) is float or type(other) is int:
             return Monomial(self.coeff / other, self.power)
 
+    def pow(self, power):
+        self **= power
+
     def __pow__(self, power, modulo=None):
         if type(power) is float or type(power) is int:
             return Monomial(self.coeff ** power, self.power * power)
+
+    def negate(self):
+        self.coeff *= -1
 
     def __neg__(self):
         return Monomial(-self.coeff, self.power)
