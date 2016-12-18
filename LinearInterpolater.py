@@ -8,10 +8,20 @@ class LinearInterpolator(object):
 
     def eval(self, x):
         # y - y1 = m (x - x1)
-        if self.pts[0][0] < x < self.pts[len(self.pts)-1][1]:
+
+        if self.pts[0][0] < x < self.pts[-1][0]:
             for index, item in enumerate(self.pts[1:-1]):
                 if item[0] == x:
                     return item[1]
                 if self.pts[index-1][0] < x < self.pts[index+1][0]:
                     m = (self.pts[index+1][1] - self.pts[index-1][1]) / (self.pts[index+1][0] - self.pts[index-1][0])
                     return m * (x - self.pts[index+1][0]) + self.pts[index+1][1]
+        elif x < self.pts[0][0]:
+            m = (self.pts[1][1] - self.pts[0][1]) / (self.pts[1][0] - self.pts[0][0])
+            return m * (x - self.pts[0][0]) + self.pts[0][1]
+        elif x > self.pts[-1][0]:
+            m = (self.pts[-1][1] - self.pts[-2][1]) / (self.pts[-1][0] - self.pts[-2][0])
+            return m * (x - self.pts[-1][0]) + self.pts[-1][1]
+        else:
+            return x
+
