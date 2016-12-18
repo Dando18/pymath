@@ -1,10 +1,10 @@
 import copy
-import Monomial
+from Monomial import Monomial
 
 
 class Polynomial(object):
 
-    monomials = []  # type: [float]
+    monomials = []  # type: [Monomial]
 
     def __init__(self, monomials):
         self.monomials = copy.deepcopy(monomials)
@@ -24,25 +24,34 @@ class Polynomial(object):
         s += ' == ' + str(self.eval(value))
         return s
 
-    def add(self, monomial):
-        self.monomials.append(monomial)
+    def add(self, other):
+        if isinstance(other, Polynomial):
+            self.monomials.append(other.monomials)
+        elif isinstance(other, Monomial):
+            self.monomials.append(other)
+        elif isinstance(other, float) or isinstance(other, int):
+            self.monomials.append(Monomial(other, 0))
         self.sort()
 
     def __add__(self, other):
         poly = None
         if type(other) is Polynomial:
             poly = Polynomial(self.monomials + other.monomials)
-        elif type(other) is Monomial:
+        elif isinstance(other, Monomial):
             poly = Polynomial(self.monomials + [other])
         elif type(other) is float or type(other) is int:
             poly = Polynomial(self.monomials + [Monomial(other, 0)])
         poly.reduce()
         return poly
 
-    def sub(self, monomial):
-        mono = monomial
-        mono.coeff = -mono.coeff
-        self.monomials.append(mono)
+    def sub(self, other):
+        if isinstance(other, Polynomial):
+            self.monomials.append(other.monomials)
+        elif isinstance(other, Monomial):
+            self.monomials.append(other)
+        elif isinstance(other, float) or isinstance(other, int):
+            self.monomials.append(Monomial(other, 0))
+        self.sort()
 
     def __sub__(self, other):
         poly = None
@@ -54,6 +63,10 @@ class Polynomial(object):
             poly = Polynomial(self.monomials + [-Monomial(other, 0)])
         poly.reduce()
         return poly
+
+    def mul(self, other):
+        self *= other
+        self.sort()
 
     def __mul__(self, other):
         poly = None
@@ -70,11 +83,14 @@ class Polynomial(object):
         poly.reduce()
         return poly
 
+    def div(self, other):
+        self /= other
+
     def __truediv__(self, other):
         return self.__divmod__(other)[0]
 
     def __mod__(self, other):
-        return self.divmod__(other)[1]
+        return self.__divmod__(other)[1]
 
     def __divmod__(self, other):
         poly = None
@@ -129,6 +145,8 @@ class Polynomial(object):
                     self.monomials[i].coeff += self.monomials[i+1].coeff
                     self.monomials.remove(self.monomials[i+1])
                     continue
+            if mono.coeff == 0:
+                self.monomials.remove(mono)
 
     def pretty_print(self):
         s = ""
@@ -138,7 +156,7 @@ class Polynomial(object):
             else:
                 s += mono.pretty_print()
         if s.startswith('+'):
-            s = s[1:len(s)]
+            s = s[1:]
         return s
 
     def __str__(self):
