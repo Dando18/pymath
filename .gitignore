@@ -89,4 +89,5 @@ ENV/
 .ropeproject
 
 # Pycharm project files
-idea/
+.idea/
+vcs.xml
